@@ -3,16 +3,25 @@ from .models import UserProfile, Class, Question, ClassTaken
 # Register your models here.
 
 
+class QuestionInline(admin.StackedInline):
+    model = Question
+    extra = 3
+
+
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     fields = ['user', 'age', 'city', 'grade', 'board', ]
-    list_display = ['user', 'age', 'city', 'grade', 'board', ]
+    list_display = ['user', 'age', 'city', 'grade', 'board']
 
 
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
-    fields = ['classTitle', 'instructorName', ]
+    fieldsets = [
+        (None, {'fields': ['classTitle', 'instructorName']})
+    ]
+    # fields = ['classTitle', 'instructorName', ]
     list_display = ['classTitle', 'instructorName', ]
+    inlines = [QuestionInline]
 
 
 @admin.register(Question)
