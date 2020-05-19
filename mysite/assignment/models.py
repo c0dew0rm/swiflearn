@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     board = models.CharField(max_length=30, null=False, default=None)
 
     def __str__(self):
-        return user.username
+        return self.user.username
 
 class Class(models.Model):
     classTitle = models.CharField(max_length=30, null=False, default=None, unique=True)
@@ -22,15 +22,18 @@ class Class(models.Model):
 
 
 class ClassTaken(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    classTaken = models.OneToOneField(Class, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    classTaken = models.ForeignKey(Class, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'classTaken',)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 class Question(models.Model):
     className = models.ForeignKey(Class, on_delete=models.CASCADE)
-    question = models.CharField(max_length=30, null=False, default=None, unique=True)
+    question = models.TextField(max_length=500, null=False, default=None)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
