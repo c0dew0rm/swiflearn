@@ -11,7 +11,7 @@ class QuestionInline(admin.StackedInline):
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     fields = ['user', 'age', 'city', 'grade', 'board', ]
-    list_display = ['user', 'age', 'city', 'grade', 'board']
+    list_display = ['id', 'user', 'age', 'city', 'grade', 'board']
 
 
 @admin.register(Class)
@@ -20,7 +20,7 @@ class ClassAdmin(admin.ModelAdmin):
         (None, {'fields': ['classTitle', 'instructorName']})
     ]
     # fields = ['classTitle', 'instructorName', ]
-    list_display = ['classTitle', 'instructorName', ]
+    list_display = ['id','classTitle', 'instructorName', ]
     inlines = [QuestionInline]
 
 
