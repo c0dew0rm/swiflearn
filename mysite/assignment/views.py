@@ -4,12 +4,15 @@ from django.db import transaction
 from django.contrib.auth import login, authenticate
 
 from .forms import UserForm, UserProfileForm
-from .models import UserProfile
+from .models import UserProfile, ClassTaken, Class
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework import viewsets
 
+from .serializer import UserProfileSerializer, ClassTakenSerializer, ClassSerializer
 # Create your views here.
 
 def index(request):
@@ -36,24 +39,43 @@ def signup(request):
 
 
 @api_view(['POST','GET'])
+@permission_classes([AllowAny])
 def login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         try:
             user = authenticate(username=username,password=password)
-            student = UserProfile.objects.get(user__username=username)
+            login(request, user)
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            HttpResponse("Invalid User Credentials")
 
-        if student is not None:
-            try:
-                url = "details/"+str(student.id)
+        try:
+            student = UserProfile.objects.get(user__username=username)
+            if student is not None:
+                url = "/details/"+str(student.id)
                 return redirect(url)
-            except:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            return render("/")
-
+            else:
+                return HttpResponse("Student not found")
+        except:
+            Response(status=status.HTTP_404_NOT_FOUND)
     else:
         return render(request, 'login.html')
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def details(request, pk):
+    
+    try:
+        queryset = UserProfile.objects.get(pk=pk)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)   
+
+    if request.method == 'GET':
+        serializer_class = UserProfileSerializer(queryset)
+        return Response(serializer_class.data)
+
+
+class ClassTakenViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
